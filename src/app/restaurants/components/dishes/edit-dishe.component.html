@@ -2,16 +2,12 @@
     <div class="modal-content">
         <h4><i class="material-icons">keyboard_arrow_right</i>Editando prato <small class="grey-text">atualize o prato</small></h4>
         
-        <form class="row">
-            <div class="input-field col s12">
-                <input id="name" type="text">
-                <label for="name">Nome do prato</label>
-            </div>
-
+        <form class="row" (submit)="save($event)">
+                
             <div class="file-field input-field">
                 <div class="btn">
                     <span>Foto</span>
-                    <input type="file">
+                    <input type="file" (change)="addFile($event)">
                 </div>
                 <div class="file-path-wrapper">
                     <input class="file-path validate" type="text">
@@ -19,17 +15,22 @@
             </div>
 
             <div class="input-field col s12">
-                <textarea id="description" class="materialize-textarea"></textarea>
+                <input id="name" name="name" [(ngModel)]="dish.name" type="text" placeholder="Nome do prato">
+                <label for="name">Nome do prato</label>
+            </div>
+
+            <div class="input-field col s12">
+                <textarea id="description" name="description" [(ngModel)]="dish.description" class="materialize-textarea" placeholder="descrição"></textarea>
                 <label for="description">Descrição</label>
             </div>
 
             <div class="input-field col s12">
-                <input id="price" type="text">
+                <input id="price" name="price" [(ngModel)]="dish.price" type="text" placeholder="Preço do prato">
                 <label for="price">Valor</label>
             </div>
             
             <div class="input-field col s12">
-                <input type="button" value="Salvar" class="btn">
+                <input type="submit" value="Salvar" class="btn">
             </div>
         </form>
     </div>

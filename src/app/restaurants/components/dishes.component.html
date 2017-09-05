@@ -1,0 +1,33 @@
+<div class="row">
+    <div class="col s12">
+        <h4><i class="material-icons">keyboard_arrow_right</i>Pratos <small class="grey-text">seu cardápio</small></h4>
+        <p>
+            <a [routerLink]="['new']" class="btn">
+                <i class="material-icons">add_box</i> Novo prato
+            </a>
+        </p>
+    </div>
+
+    <div class="col s12 m4" *ngFor="let dish of dishes.data">
+        <div class="card">
+            <div class="card-image">
+                <img src="{{ dish.photo_full_url }}">
+                <span class="card-title">{{dish.name}}</span>
+                <a class="btn-floating halfway-fab red" (click)="remove(dish.id)">
+                    <i class="material-icons">close</i>
+                </a>
+            </div>
+            <div class="card-content">
+                <p>{{dish.description}}</p>
+                <hr>
+                <p>R$ {{dish.price}}</p>
+            </div>
+            <div class="card-action">
+                <a [routerLink]="['edit/' + dish.id]" >Editar</a>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<router-outlet></router-outlet>

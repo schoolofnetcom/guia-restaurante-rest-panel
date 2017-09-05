@@ -56,8 +56,14 @@
     </div>
 
     <div class="col s3">
-        <div class="card-panel grey white-text center-align photo-changer"
-            [ngClass]="{'lighten-1': dragging}"
+        <div class="card-panel white-text center-align photo-changer"
+            [ngClass]="{
+                'lighten-1': dragging,
+                'grey': upload_status === 'not',
+                'amber': upload_status === 'sending',
+                'green': upload_status === 'success',
+                'red': upload_status === 'error'
+            }"
             (click)="file.click()"
             (drop)="upload($event)"
             (dragover)="dragover($event)"
@@ -65,8 +71,13 @@
             >
                 <i class="material-icons">insert_photo</i>
                 <p *ngIf="!dragging;else release">Arraste sua foto aqui ou clique para enviar</p>
-                <ng-template #release> <p>Solte para enviar</p> </ng-template>
-                <input type="file" accept="image/*" #file style="display: none">
+                <ng-template #release>
+                    <p *ngIf="upload_status === 'not'">Solte para enviar</p>
+                    <p *ngIf="upload_status === 'sending'">Enviando, aguarde...</p>
+                    <p *ngIf="upload_status === 'success'">Enviado com sucesso, você pode arrastar ou clicar aqui para enviar outro</p>
+                    <p *ngIf="upload_status === 'error'">Erro ao enviar, tente novamente ou contate o administrador do sistema.</p>
+                </ng-template>
+                <input type="file" accept="image/*" #file style="display: none" (change)="upload($event)">
         </div>
     </div>
 </div>
@@ -80,40 +91,25 @@
                         <span class="card-title">Fotos do restaurante</span>
                     </div>
 
-                    <div class="col s3 margin-bottom">
-                        <img class="materialboxed responsive-img" width="650" src="http://materializecss.com/images/sample-1.jpg">
-                        <a class="btn"><i class="material-icons">cancel</i></a>
-                    </div>
-
-                    <div class="col s3 margin-bottom">
-                        <img class="materialboxed responsive-img" width="650" src="http://materializecss.com/images/sample-1.jpg">
-                        <a class="btn"><i class="material-icons">cancel</i></a>
-                    </div>
-
-                    <div class="col s3 margin-bottom">
-                        <img class="materialboxed responsive-img" width="650" src="http://materializecss.com/images/sample-1.jpg">
-                        <a class="btn"><i class="material-icons">cancel</i></a>
-                    </div>
-
-                    <div class="col s3 margin-bottom">
-                        <img class="materialboxed responsive-img" width="650" src="http://materializecss.com/images/sample-1.jpg">
-                        <a class="btn"><i class="material-icons">cancel</i></a>
-                    </div>
-
-                    <div class="col s3 margin-bottom">
-                        <img class="materialboxed responsive-img" width="650" src="http://materializecss.com/images/sample-1.jpg">
-                        <a class="btn"><i class="material-icons">cancel</i></a>
+                    <div class="col s3 margin-bottom" *ngFor="let photo of photos">
+                        <img class="materialboxed responsive-img" width="650" src="{{photo.full_url}}">
+                        <a class="btn" (click)="deletePhoto(photo)"><i class="material-icons">cancel</i></a>
                     </div>
 
                 </div>
                 <div class="card-action">
-                    <div class="file-field input-field">
-                        <div class="btn">
-                            <span>Foto</span>
-                            <input type="file">
+                    <div class="row">
+                        <div class="file-field input-field col s9">
+                            <div class="btn">
+                                <span>Foto</span>
+                                <input type="file" (change)="preparePhoto($event)">
+                            </div>
+                            <div class="file-path-wrapper">
+                                <input class="file-path validate" type="text">
+                            </div>
                         </div>
-                        <div class="file-path-wrapper">
-                            <input class="file-path validate" type="text">
+                        <div class="input-field col s3 right-align">
+                            <input type="submit" value="Enviar" class="btn" (click)="sendPhoto()">
                         </div>
                     </div>
                 </div>

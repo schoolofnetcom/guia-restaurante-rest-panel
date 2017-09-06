@@ -23,10 +23,7 @@ export class RestaurantService extends AppHttpService {
     }
 
     upload(url: string, data: Object) {
-        return this.http.post(this.url + '/' + url, data, {headers: this.header})
-            .toPromise()
-            .then((res) => {
-                return res.json() || {};
-            });
+        let observable = this.http.post(this.url + '/' + url, data, {headers: this.header})
+        return this.toPromise(observable);
     }
 }

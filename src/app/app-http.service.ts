@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Http, Headers } from '@angular/http';
 import { environment } from '../environments/environment';
+import { Router } from '@angular/router';
 
 import 'rxjs/add/operator/toPromise';
 
@@ -9,7 +10,7 @@ export class AppHttpService {
     protected url: string;
     protected header: Headers;
 
-    constructor (protected http: Http) {
+    constructor (protected http: Http, private router: Router) {
         this.setAccessToken();
     }
 
@@ -17,13 +18,8 @@ export class AppHttpService {
         return this.http;
     }
 
-    getUser() {
-        return this.builder('auth/me')
-            .list();
-    }
-
     setAccessToken () {
-        let token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImVmMTc3OWM0N2QyOWM5MGFiMTIwYThmODhhOGJkYjg1YWY0ZGNiNDFkMzBhOTc4ZmYxYzlhNzFiZGE3YjExMmFmZGRkMzY4OTBkMjEzYjYwIn0.eyJhdWQiOiIzIiwianRpIjoiZWYxNzc5YzQ3ZDI5YzkwYWIxMjBhOGY4OGE4YmRiODVhZjRkY2I0MWQzMGE5NzhmZjFjOWE3MWJkYTdiMTEyYWZkZGQzNjg5MGQyMTNiNjAiLCJpYXQiOjE1MDM2ODQ4MjcsIm5iZiI6MTUwMzY4NDgyNywiZXhwIjoxNTM1MjIwODI2LCJzdWIiOiIxIiwic2NvcGVzIjpbXX0.FKu2fr6n44KLqkgRVsRfI3fRCj73davaMvpobMRjjTfS1FY63Zd_3WziJ34F24hrUzwsZ7xLdT-5f5mPXfmuRTHW1h8aMs2sJV7d6ZgI3Mq7L5crJWK2NQ0DmSIH1TCekLqx9Rb-A2N3vZ08i1b1bfmFLmGXK6ZpEj4CkV30CXMHWy3l7TKsRizoviwR_HRdIbzwVidagVzAlReyB7-7xhuxM_846EK7uM4fbMA0wdjZtla0K_jsvBPVczVY2mRmOjpl9t_i6mDCrW-4kGQChG5bNJZdphMvaeyQLVHfLCptuJR_HzS0ejM7BDtL9Udx2NVOLCj6ahv2t4YTAEnRfSx68rVJW8SAPaCTqlqzxoVr9B5_eL3GQqsuF2XLjMGJcNVQ7LInpO79boZHOaQgsXncyuNINHiY-oe7lapGnU7_gWVp9mfypE-_PVLIAH880VAT1oQ9nq_Dyq5cqFfa38A5Tt1C8ws8g-5eJi2HAfzvAexTaFeZwwJML0ZOONYQlEwJNIz3C4AB4C3EuefIsJE6IQ5-KrLSHEb4vqVhOWCjJHnhVvjfGLEJ7c2uUMoUhSHksiJyot-gXLTo-PGjvttEwONlB1kfzCfGKbkmMkXMVxS7-8TLYDV_VnmlOvXjjQMjfjxXSAeL0h7lV0P9wHIstdqWB9vv1z5r6X68MnE';
+        let token = this.getCookie('token');
         this.header = new Headers({'Authorization': 'Bearer ' + token, 'Accept': 'application/json'});
     }
 
@@ -44,42 +40,69 @@ export class AppHttpService {
             });
         }
 
-        return this.http.get(url, {headers: this.header})
-            .toPromise()
-            .then((res) => {
-                return res.json() || {};
-            });
+        let observable = this.http.get(url, {headers: this.header})
+        return this.toPromise(observable);
     }
 
     view (id: number) {
-        return this.http.get(this.url + '/' + id, {headers: this.header})
-            .toPromise()
-            .then((res) => {
-                return res.json() || {};
-            });
+        let observable = this.http.get(this.url + '/' + id, {headers: this.header})
+        return this.toPromise(observable);
     }
 
     update(id: number, data: object) {
-        return this.http.put(this.url + '/' + id, data, {headers: this.header})
-            .toPromise()
-            .then((res) => {
-                return res.json() || {};
-            });
+        let observable = this.http.put(this.url + '/' + id, data, {headers: this.header})
+        return this.toPromise(observable);
     }
 
     insert (data: Object) {
-        return this.http.post(this.url, data, {headers: this.header})
-            .toPromise()
-            .then((res) => {
-                return res.json() || {};
-            });
+        let observable = this.http.post(this.url, data, {headers: this.header})
+        return this.toPromise(observable);
     }
 
     delete (id: number) {
-        return this.http.delete(this.url + '/' + id, {headers: this.header})
-            .toPromise()
+        let observable = this.http.delete(this.url + '/' + id, {headers: this.header});
+        return this.toPromise(observable);
+    }
+
+    protected toPromise(request) {
+        return request.toPromise()
             .then((res) => {
-                return res.json() || {};
+                return res.json() || {}
+            })
+            .catch((err) => {
+                let message = 'Algo deu errado no servidor, informe o erro ' + err.status + ' ao administrador';
+                if (err.status === 401) {
+                    message = 'Você não tem permissão para ver isso, informe um usuário e senha válidos';
+                    this.router.navigate(['/login']);
+                }
+
+                if (err.status === 422) {
+                    message = 'Falha de validação, verifique os campos';
+                }
+
+                if (err.status === 404) {
+                    message = 'Impossível se conectar ao servidor, verifique sua conexão ou tente novamente em alguns minutos';
+                }
+
+                window.Materialize.toast(message, 3000, 'red');
             });
+    }
+
+    private getCookie(name: string) {
+        let cookies = document.cookie;
+        if (!cookies) {
+            return null;
+        }
+
+        let cookiesCollection: string[] = cookies.split(';');
+        for(let i= 0; i < cookiesCollection.length; i++) {
+            let cookieCurrent = cookiesCollection[i].split('=');
+
+            if (cookieCurrent[0].trim() === name) {
+                return cookieCurrent[1] || null;
+            }
+        }
+
+        return null;
     }
 }

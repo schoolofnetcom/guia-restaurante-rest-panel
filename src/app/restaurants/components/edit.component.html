@@ -15,6 +15,11 @@
                 </div>
         
                 <div class="input-field col s6">
+                    <input id="phone" type="text" name="phone" [(ngModel)]="restaurant.phone" placeholder="Telefone">
+                    <label for="phone">Telefone</label>
+                </div>
+        
+                <div class="input-field col s6">
                     <input id="cep" type="text" name="cep" [(ngModel)]="address.cep" (keyup)="searchCep()" placeholder="CEP">
                     <label for="cep">CEP</label>
                 </div>

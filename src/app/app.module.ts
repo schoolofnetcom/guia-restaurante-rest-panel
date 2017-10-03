@@ -4,6 +4,11 @@ import { NgModule } from '@angular/core';
 import { HttpModule } from '@angular/http';
 import { FormsModule } from '@angular/forms';
 
+import { environment } from '../environments/environment';
+
+import { FirebaseService } from './firebase.service';
+import { AngularFireModule } from 'angularfire2';
+
 import { RestaurantsModule } from './restaurants/restaurant.module';
 import { UserModule } from './user/user.module';
 import { AppHttpService } from './app-http.service';
@@ -24,10 +29,12 @@ import { AppComponent } from './app.component';
     HttpModule,
     UserModule,
     RestaurantsModule,
-    RouterModule.forRoot(appRoutes)
+    RouterModule.forRoot(appRoutes),
+    AngularFireModule.initializeApp(environment.firebase)
   ],
   providers: [
-    AppHttpService
+    AppHttpService,
+    FirebaseService
   ],
   bootstrap: [AppComponent]
 })

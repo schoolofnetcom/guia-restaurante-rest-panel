@@ -1,0 +1,8 @@
+{
+    "name": "Restaurante Dashboard",
+    "short_name": "Restaurantes",
+    "start_url": "",
+    "background_color": "#FFFFFF",
+    "gsm_sender_id": "103953800507",
+    "gsm_user_visible_only": true
+}

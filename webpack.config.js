@@ -371,7 +371,8 @@ module.exports = {
     new GlobCopyWebpackPlugin({
       "patterns": [
         "assets",
-        "favicon.ico"
+        "favicon.ico",
+        'firebase-messaging-sw.js'
       ],
       "globOptions": {
         "cwd": path.join(process.cwd(), "src"),
